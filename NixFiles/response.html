@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create test-pw-note - NixFiles</title>
+    
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/site.css?v=r0oKb5aXZy1HTUIKczZgD8q9MDFbKWf3FtSZxPL1V70" />
+    <link rel="stylesheet" href="/NixFiles.styles.css?v=OEd__hnu3UEk7gEngjGruVZMJG8IItDZXxlDY0lmvGo" />
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+
+</head>
+<body>
+    <header b-j05mecx5oe>
+        <nav b-j05mecx5oe class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom">
+            <div b-j05mecx5oe class="container-fluid">
+                <a class="navbar-brand" href="/">NixFiles</a>
+            </div>
+        </nav>
+    </header>
+    <div b-j05mecx5oe class="container">
+        <main b-j05mecx5oe role="main">
+            
+
+
+<section class="note-shell">
+    <div class="note-heading">
+        <div>
+            <span class="eyebrow">/test-pw-note</span>
+            <h1>Create Nix</h1>
+        </div>
+        <a class="btn btn-outline-secondary" href="/">New path</a>
+    </div>
+
+
+
+    <div class="editor-layout">
+        <form method="post" class="note-form" action="/test-pw-note/save">
+            <input type="hidden" data-val="true" data-val-required="The Name field is required." id="Name" name="Name" value="test-pw-note" />
+            <input type="hidden" data-val="true" data-val-required="The IsNew field is required." id="IsNew" name="IsNew" value="True" />
+            <input type="hidden" data-val="true" data-val-required="The IsProtected field is required." id="IsProtected" name="IsProtected" value="False" />
+            <input id="imageInput" type="file" accept="image/*" multiple hidden />
+
+            <div class="editor-frame">
+                <textarea id="Content" rows="18" data-val="true" data-val-required="The Content field is required." name="Content">
+</textarea>
+            </div>
+
+            <div class="save-bar">
+                <div class="tag-field">
+                    <label class="form-label" for="TagsText">Tags</label>
+                    <input class="form-control" placeholder="school, todo, draft" autocomplete="off" type="text" data-val="true" data-val-required="The TagsText field is required." id="TagsText" name="TagsText" value="" />
+                </div>
+                    <div class="password-field">
+                        <label class="form-label" for="Password">Password</label>
+                        <input class="form-control" type="password" autocomplete="new-password" placeholder="Optional" id="Password" name="Password" />
+                    </div>
+                <button class="btn btn-primary" type="submit">Save</button>
+            </div>
+        <input name="__RequestVerificationToken" type="hidden" value="CfDJ8DMT_eXqOztLmLdpb-8QnuLkA0DTZsz1Hhoh0sUpKhvxZiqgLA62Je_3BzhnNkwJaTngRcPRlWBxFwCADXjpEnkwcQ3eGBk7BJxLCXWxq436cmIR1fA-v7WU8BAnrrIzza52ampd7rs1LeBuF9dJsMo" /></form>
+
+    </div>
+</section>
+
+
+        </main>
+    </div>
+
+    <footer b-j05mecx5oe class="footer text-muted">
+        <div b-j05mecx5oe class="container">
+            &copy; 2026 - NixFiles
+        </div>
+    </footer>
+    <script src="/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/site.js?v=hRQyftXiu1lLX2P9Ly9xa4gHJgLeR1uGN5qegUobtGo"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+    <script>
+        const imageInput = document.getElementById("imageInput");
+        const noteName = "test-pw-note";
+        const customImageButton = {
+            name: "image",
+            action: function () {
+                imageInput.click();
+            },
+            className: "fa fa-picture-o",
+            title: "Attach image"
+        };
+
+        const editor = new EasyMDE({
+            element: document.getElementById("Content"),
+            spellChecker: false,
+            status: false,
+            autofocus: true,
+            lineWrapping: true,
+            toolbar: [
+                "bold", "italic", "heading", "|",
+                "quote", "unordered-list", "ordered-list", "|",
+                "link", customImageButton, "|",
+                "preview", "side-by-side", "fullscreen", "|",
+                "guide"
+            ],
+            sanitizerFunction: function (renderedHtml) {
+                return DOMPurify.sanitize(renderedHtml, {
+                    ADD_DATA_URI_TAGS: ["img"]
+                });
+            }
+        });
+
+        function insertImageFile(file) {
+            if (!file || !file.type.startsWith("image/")) {
+                return;
+            }
+
+            const token = document.querySelector("input[name='__RequestVerificationToken']").value;
+            const formData = new FormData();
+            formData.append("__RequestVerificationToken", token);
+            formData.append("image", file);
+
+            fetch(`/${encodeURIComponent(noteName)}/image`, {
+                method: "POST",
+                headers: {
+                    "RequestVerificationToken": token
+                },
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Image upload failed.");
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    const safeName = (file.name || "image").replace(/[^\w.-]+/g, "-");
+                    const markdown = `![${safeName}](${result.url})`;
+                    editor.codemirror.replaceSelection(`${markdown}\n`);
+                    editor.codemirror.focus();
+                    editor.codemirror.save();
+                })
+                .catch(() => {
+                    window.alert("The image could not be attached.");
+                });
+        }
+
+        function insertImageFiles(files) {
+            Array.from(files)
+                .filter(file => file.type.startsWith("image/"))
+                .forEach(insertImageFile);
+        }
+
+        imageInput.addEventListener("change", function () {
+            insertImageFiles(imageInput.files);
+            imageInput.value = "";
+        });
+
+        editor.codemirror.on("paste", function (_, event) {
+            const files = event.clipboardData?.files;
+            if (files && Array.from(files).some(file => file.type.startsWith("image/"))) {
+                event.preventDefault();
+                insertImageFiles(files);
+            }
+        });
+
+        editor.codemirror.on("drop", function (_, event) {
+            const files = event.dataTransfer?.files;
+            if (files && Array.from(files).some(file => file.type.startsWith("image/"))) {
+                event.preventDefault();
+                insertImageFiles(files);
+            }
+        });
+
+        document.querySelector(".note-form").addEventListener("submit", function () {
+            editor.codemirror.save();
+        });
+    </script>
+
+</body>
+</html>

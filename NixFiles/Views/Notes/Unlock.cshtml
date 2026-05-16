@@ -1,0 +1,28 @@
+@model UnlockNoteViewModel
+
+@{
+    ViewData["Title"] = $"Unlock {Model.Name}";
+}
+
+<section class="unlock-shell">
+    <div class="note-heading">
+        <div>
+            <span class="eyebrow">/@Model.Name</span>
+            <h1>Unlock Nix</h1>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger" role="alert">@Model.ErrorMessage</div>
+    }
+
+    <form asp-controller="Notes" asp-action="Unlock" asp-route-name="@Model.Name" method="post" class="unlock-form">
+        <input asp-for="Name" type="hidden" />
+        <div class="mb-3">
+            <label asp-for="Password" class="form-label">Password</label>
+            <input asp-for="Password" class="form-control" type="password" autocomplete="current-password" autofocus required />
+        </div>
+        <button class="btn btn-primary" type="submit">Unlock</button>
+    </form>
+</section>

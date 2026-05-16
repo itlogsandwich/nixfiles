@@ -1,0 +1,897 @@
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (19ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT 1
+info: Microsoft.EntityFrameworkCore.Migrations[20411]
+      Acquiring an exclusive lock for migration application. See https://aka.ms/efcore-docs-migrations-lock for more information if this takes too long.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (18ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      DECLARE @result int;
+      EXEC @result = sp_getapplock @Resource = '__EFMigrationsLock', @LockOwner = 'Session', @LockMode = 'Exclusive';
+      SELECT @result
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      IF OBJECT_ID(N'[__EFMigrationsHistory]') IS NULL
+      BEGIN
+          CREATE TABLE [__EFMigrationsHistory] (
+              [MigrationId] nvarchar(150) NOT NULL,
+              [ProductVersion] nvarchar(32) NOT NULL,
+              CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
+          );
+      END;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (7ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [MigrationId], [ProductVersion]
+      FROM [__EFMigrationsHistory]
+      ORDER BY [MigrationId];
+info: Microsoft.EntityFrameworkCore.Migrations[20405]
+      No migrations were applied. The database is already up to date.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      DECLARE @result int;
+      EXEC @result = sp_releaseapplock @Resource = '__EFMigrationsLock', @LockOwner = 'Session';
+      SELECT @result
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://localhost:5082
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: C:\Users\tiuja\Documents\Programming\VS_DBSYS\NixFiles\NixFiles
+warn: Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware[3]
+      Failed to determine the https port for redirect.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (27ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (8ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 45), @p2='?' (Size = 450), @p3='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [NoteAccessLogs] ([AccessedAt], [IpAddress], [NoteName], [UserAgent])
+      OUTPUT INSERTED.[Id]
+      VALUES (@p0, @p1, @p2, @p3);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (6ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Name]
+      FROM [NoteTags] AS [n]
+      INNER JOIN [Tags] AS [t] ON [n].[TagId] = [t].[Id]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [t].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@p='?' (DbType = Int32), @name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(@p) [n].[Id], [n].[CreatedAt]
+      FROM [NoteVersions] AS [n]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [n].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (8ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) COUNT(*) AS [Count], MAX([n].[AccessedAt]) AS [LastAccessedAt]
+      FROM [NoteAccessLogs] AS [n]
+      WHERE [n].[NoteName] = @name
+      GROUP BY [n].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [n1].[Name], [n1].[Content], [n1].[CreatedAt], [n1].[PasswordHash], [n1].[UpdatedAt], [n0].[NoteName], [n0].[TagId]
+      FROM (
+          SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+          FROM [Notes] AS [n]
+          WHERE [n].[Name] = @name
+      ) AS [n1]
+      LEFT JOIN [NoteTags] AS [n0] ON [n1].[Name] = [n0].[NoteName]
+      ORDER BY [n1].[Name], [n0].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@noteName='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [n].[NoteName], [n].[TagId]
+      FROM [NoteTags] AS [n]
+      WHERE [n].[NoteName] = @noteName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (8ms) [Parameters=[@p0='?' (Size = 4000), @p1='?' (DbType = DateTime2), @p2='?' (Size = 450), @p5='?' (Size = 450), @p3='?' (Size = 4000), @p4='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SET NOCOUNT ON;
+      INSERT INTO [NoteVersions] ([Content], [CreatedAt], [NoteName])
+      OUTPUT INSERTED.[Id]
+      VALUES (@p0, @p1, @p2);
+      UPDATE [Notes] SET [Content] = @p3, [UpdatedAt] = @p4
+      OUTPUT 1
+      WHERE [Name] = @p5;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Name]
+      FROM [NoteTags] AS [n]
+      INNER JOIN [Tags] AS [t] ON [n].[TagId] = [t].[Id]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [t].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (DbType = Int32), @name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(@p) [n].[Id], [n].[CreatedAt]
+      FROM [NoteVersions] AS [n]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [n].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) COUNT(*) AS [Count], MAX([n].[AccessedAt]) AS [LastAccessedAt]
+      FROM [NoteAccessLogs] AS [n]
+      WHERE [n].[NoteName] = @name
+      GROUP BY [n].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 45), @p2='?' (Size = 450), @p3='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [NoteAccessLogs] ([AccessedAt], [IpAddress], [NoteName], [UserAgent])
+      OUTPUT INSERTED.[Id]
+      VALUES (@p0, @p1, @p2, @p3);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Name]
+      FROM [NoteTags] AS [n]
+      INNER JOIN [Tags] AS [t] ON [n].[TagId] = [t].[Id]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [t].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (DbType = Int32), @name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(@p) [n].[Id], [n].[CreatedAt]
+      FROM [NoteVersions] AS [n]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [n].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) COUNT(*) AS [Count], MAX([n].[AccessedAt]) AS [LastAccessedAt]
+      FROM [NoteAccessLogs] AS [n]
+      WHERE [n].[NoteName] = @name
+      GROUP BY [n].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@versionId='?' (DbType = Int32), @note_Name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Id], [n].[Content], [n].[CreatedAt], [n].[NoteName]
+      FROM [NoteVersions] AS [n]
+      WHERE [n].[Id] = @versionId AND [n].[NoteName] = @note_Name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p0='?' (Size = 4000), @p1='?' (DbType = DateTime2), @p2='?' (Size = 450), @p5='?' (Size = 450), @p3='?' (Size = 4000), @p4='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SET NOCOUNT ON;
+      INSERT INTO [NoteVersions] ([Content], [CreatedAt], [NoteName])
+      OUTPUT INSERTED.[Id]
+      VALUES (@p0, @p1, @p2);
+      UPDATE [Notes] SET [Content] = @p3, [UpdatedAt] = @p4
+      OUTPUT 1
+      WHERE [Name] = @p5;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Name]
+      FROM [NoteTags] AS [n]
+      INNER JOIN [Tags] AS [t] ON [n].[TagId] = [t].[Id]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [t].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (DbType = Int32), @name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(@p) [n].[Id], [n].[CreatedAt]
+      FROM [NoteVersions] AS [n]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [n].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) COUNT(*) AS [Count], MAX([n].[AccessedAt]) AS [LastAccessedAt]
+      FROM [NoteAccessLogs] AS [n]
+      WHERE [n].[NoteName] = @name
+      GROUP BY [n].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (7ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [n1].[Name], [n1].[Content], [n1].[CreatedAt], [n1].[PasswordHash], [n1].[UpdatedAt], [n0].[NoteName], [n0].[TagId]
+      FROM (
+          SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+          FROM [Notes] AS [n]
+          WHERE [n].[Name] = @name
+      ) AS [n1]
+      LEFT JOIN [NoteTags] AS [n0] ON [n1].[Name] = [n0].[NoteName]
+      ORDER BY [n1].[Name], [n0].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@noteName='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [n].[NoteName], [n].[TagId]
+      FROM [NoteTags] AS [n]
+      WHERE [n].[NoteName] = @noteName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (8ms) [Parameters=[@p0='?' (Size = 4000), @p1='?' (DbType = DateTime2), @p2='?' (Size = 450), @p5='?' (Size = 450), @p3='?' (Size = 4000), @p4='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SET NOCOUNT ON;
+      INSERT INTO [NoteVersions] ([Content], [CreatedAt], [NoteName])
+      OUTPUT INSERTED.[Id]
+      VALUES (@p0, @p1, @p2);
+      UPDATE [Notes] SET [Content] = @p3, [UpdatedAt] = @p4
+      OUTPUT 1
+      WHERE [Name] = @p5;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Name]
+      FROM [NoteTags] AS [n]
+      INNER JOIN [Tags] AS [t] ON [n].[TagId] = [t].[Id]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [t].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@p='?' (DbType = Int32), @name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(@p) [n].[Id], [n].[CreatedAt]
+      FROM [NoteVersions] AS [n]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [n].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) COUNT(*) AS [Count], MAX([n].[AccessedAt]) AS [LastAccessedAt]
+      FROM [NoteAccessLogs] AS [n]
+      WHERE [n].[NoteName] = @name
+      GROUP BY [n].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@versionId='?' (DbType = Int32), @note_Name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Id], [n].[Content], [n].[CreatedAt], [n].[NoteName]
+      FROM [NoteVersions] AS [n]
+      WHERE [n].[Id] = @versionId AND [n].[NoteName] = @note_Name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[@p0='?' (Size = 4000), @p1='?' (DbType = DateTime2), @p2='?' (Size = 450), @p5='?' (Size = 450), @p3='?' (Size = 4000), @p4='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SET NOCOUNT ON;
+      INSERT INTO [NoteVersions] ([Content], [CreatedAt], [NoteName])
+      OUTPUT INSERTED.[Id]
+      VALUES (@p0, @p1, @p2);
+      UPDATE [Notes] SET [Content] = @p3, [UpdatedAt] = @p4
+      OUTPUT 1
+      WHERE [Name] = @p5;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Name]
+      FROM [NoteTags] AS [n]
+      INNER JOIN [Tags] AS [t] ON [n].[TagId] = [t].[Id]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [t].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@p='?' (DbType = Int32), @name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(@p) [n].[Id], [n].[CreatedAt]
+      FROM [NoteVersions] AS [n]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [n].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) COUNT(*) AS [Count], MAX([n].[AccessedAt]) AS [LastAccessedAt]
+      FROM [NoteAccessLogs] AS [n]
+      WHERE [n].[NoteName] = @name
+      GROUP BY [n].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 45), @p2='?' (Size = 450), @p3='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [NoteAccessLogs] ([AccessedAt], [IpAddress], [NoteName], [UserAgent])
+      OUTPUT INSERTED.[Id]
+      VALUES (@p0, @p1, @p2, @p3);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Name]
+      FROM [NoteTags] AS [n]
+      INNER JOIN [Tags] AS [t] ON [n].[TagId] = [t].[Id]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [t].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@p='?' (DbType = Int32), @name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(@p) [n].[Id], [n].[CreatedAt]
+      FROM [NoteVersions] AS [n]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [n].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) COUNT(*) AS [Count], MAX([n].[AccessedAt]) AS [LastAccessedAt]
+      FROM [NoteAccessLogs] AS [n]
+      WHERE [n].[NoteName] = @name
+      GROUP BY [n].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 45), @p2='?' (Size = 450), @p3='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [NoteAccessLogs] ([AccessedAt], [IpAddress], [NoteName], [UserAgent])
+      OUTPUT INSERTED.[Id]
+      VALUES (@p0, @p1, @p2, @p3);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Name]
+      FROM [NoteTags] AS [n]
+      INNER JOIN [Tags] AS [t] ON [n].[TagId] = [t].[Id]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [t].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@p='?' (DbType = Int32), @name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(@p) [n].[Id], [n].[CreatedAt]
+      FROM [NoteVersions] AS [n]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [n].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) COUNT(*) AS [Count], MAX([n].[AccessedAt]) AS [LastAccessedAt]
+      FROM [NoteAccessLogs] AS [n]
+      WHERE [n].[NoteName] = @name
+      GROUP BY [n].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [n1].[Name], [n1].[Content], [n1].[CreatedAt], [n1].[PasswordHash], [n1].[UpdatedAt], [n0].[NoteName], [n0].[TagId]
+      FROM (
+          SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+          FROM [Notes] AS [n]
+          WHERE [n].[Name] = @name
+      ) AS [n1]
+      LEFT JOIN [NoteTags] AS [n0] ON [n1].[Name] = [n0].[NoteName]
+      ORDER BY [n1].[Name], [n0].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@p0='?' (Size = 450), @p1='?' (Size = 4000), @p2='?' (DbType = DateTime2), @p3='?' (Size = 4000), @p4='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [Notes] ([Name], [Content], [CreatedAt], [PasswordHash], [UpdatedAt])
+      VALUES (@p0, @p1, @p2, @p3, @p4);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@noteName='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [n].[NoteName], [n].[TagId]
+      FROM [NoteTags] AS [n]
+      WHERE [n].[NoteName] = @noteName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Name]
+      FROM [NoteTags] AS [n]
+      INNER JOIN [Tags] AS [t] ON [n].[TagId] = [t].[Id]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [t].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@p='?' (DbType = Int32), @name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(@p) [n].[Id], [n].[CreatedAt]
+      FROM [NoteVersions] AS [n]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [n].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) COUNT(*) AS [Count], MAX([n].[AccessedAt]) AS [LastAccessedAt]
+      FROM [NoteAccessLogs] AS [n]
+      WHERE [n].[NoteName] = @name
+      GROUP BY [n].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 45), @p2='?' (Size = 450), @p3='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [NoteAccessLogs] ([AccessedAt], [IpAddress], [NoteName], [UserAgent])
+      OUTPUT INSERTED.[Id]
+      VALUES (@p0, @p1, @p2, @p3);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Name]
+      FROM [NoteTags] AS [n]
+      INNER JOIN [Tags] AS [t] ON [n].[TagId] = [t].[Id]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [t].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@p='?' (DbType = Int32), @name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(@p) [n].[Id], [n].[CreatedAt]
+      FROM [NoteVersions] AS [n]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [n].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) COUNT(*) AS [Count], MAX([n].[AccessedAt]) AS [LastAccessedAt]
+      FROM [NoteAccessLogs] AS [n]
+      WHERE [n].[NoteName] = @name
+      GROUP BY [n].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (68ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (30ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (6ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (46ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 45), @p2='?' (Size = 450), @p3='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [NoteAccessLogs] ([AccessedAt], [IpAddress], [NoteName], [UserAgent])
+      OUTPUT INSERTED.[Id]
+      VALUES (@p0, @p1, @p2, @p3);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (25ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Name]
+      FROM [NoteTags] AS [n]
+      INNER JOIN [Tags] AS [t] ON [n].[TagId] = [t].[Id]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [t].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (11ms) [Parameters=[@p='?' (DbType = Int32), @name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(@p) [n].[Id], [n].[CreatedAt]
+      FROM [NoteVersions] AS [n]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [n].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (8ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) COUNT(*) AS [Count], MAX([n].[AccessedAt]) AS [LastAccessedAt]
+      FROM [NoteAccessLogs] AS [n]
+      WHERE [n].[NoteName] = @name
+      GROUP BY [n].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (11ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [n1].[Name], [n1].[Content], [n1].[CreatedAt], [n1].[PasswordHash], [n1].[UpdatedAt], [n0].[NoteName], [n0].[TagId]
+      FROM (
+          SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+          FROM [Notes] AS [n]
+          WHERE [n].[Name] = @name
+      ) AS [n1]
+      LEFT JOIN [NoteTags] AS [n0] ON [n1].[Name] = [n0].[NoteName]
+      ORDER BY [n1].[Name], [n0].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[@p0='?' (Size = 450), @p1='?' (Size = 4000), @p2='?' (DbType = DateTime2), @p3='?' (Size = 4000), @p4='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [Notes] ([Name], [Content], [CreatedAt], [PasswordHash], [UpdatedAt])
+      VALUES (@p0, @p1, @p2, @p3, @p4);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[@noteName='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [n].[NoteName], [n].[TagId]
+      FROM [NoteTags] AS [n]
+      WHERE [n].[NoteName] = @noteName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Name]
+      FROM [NoteTags] AS [n]
+      INNER JOIN [Tags] AS [t] ON [n].[TagId] = [t].[Id]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [t].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@p='?' (DbType = Int32), @name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(@p) [n].[Id], [n].[CreatedAt]
+      FROM [NoteVersions] AS [n]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [n].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) COUNT(*) AS [Count], MAX([n].[AccessedAt]) AS [LastAccessedAt]
+      FROM [NoteAccessLogs] AS [n]
+      WHERE [n].[NoteName] = @name
+      GROUP BY [n].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [n1].[Name], [n1].[Content], [n1].[CreatedAt], [n1].[PasswordHash], [n1].[UpdatedAt], [n0].[NoteName], [n0].[TagId]
+      FROM (
+          SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+          FROM [Notes] AS [n]
+          WHERE [n].[Name] = @name
+      ) AS [n1]
+      LEFT JOIN [NoteTags] AS [n0] ON [n1].[Name] = [n0].[NoteName]
+      ORDER BY [n1].[Name], [n0].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@p0='?' (Size = 450), @p1='?' (Size = 4000), @p2='?' (DbType = DateTime2), @p3='?' (Size = 4000), @p4='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [Notes] ([Name], [Content], [CreatedAt], [PasswordHash], [UpdatedAt])
+      VALUES (@p0, @p1, @p2, @p3, @p4);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@noteName='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [n].[NoteName], [n].[TagId]
+      FROM [NoteTags] AS [n]
+      WHERE [n].[NoteName] = @noteName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Name]
+      FROM [NoteTags] AS [n]
+      INNER JOIN [Tags] AS [t] ON [n].[TagId] = [t].[Id]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [t].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@p='?' (DbType = Int32), @name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(@p) [n].[Id], [n].[CreatedAt]
+      FROM [NoteVersions] AS [n]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [n].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) COUNT(*) AS [Count], MAX([n].[AccessedAt]) AS [LastAccessedAt]
+      FROM [NoteAccessLogs] AS [n]
+      WHERE [n].[NoteName] = @name
+      GROUP BY [n].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 45), @p2='?' (Size = 450), @p3='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [NoteAccessLogs] ([AccessedAt], [IpAddress], [NoteName], [UserAgent])
+      OUTPUT INSERTED.[Id]
+      VALUES (@p0, @p1, @p2, @p3);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Name]
+      FROM [NoteTags] AS [n]
+      INNER JOIN [Tags] AS [t] ON [n].[TagId] = [t].[Id]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [t].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p='?' (DbType = Int32), @name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(@p) [n].[Id], [n].[CreatedAt]
+      FROM [NoteVersions] AS [n]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [n].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) COUNT(*) AS [Count], MAX([n].[AccessedAt]) AS [LastAccessedAt]
+      FROM [NoteAccessLogs] AS [n]
+      WHERE [n].[NoteName] = @name
+      GROUP BY [n].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [n1].[Name], [n1].[Content], [n1].[CreatedAt], [n1].[PasswordHash], [n1].[UpdatedAt], [n0].[NoteName], [n0].[TagId]
+      FROM (
+          SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+          FROM [Notes] AS [n]
+          WHERE [n].[Name] = @name
+      ) AS [n1]
+      LEFT JOIN [NoteTags] AS [n0] ON [n1].[Name] = [n0].[NoteName]
+      ORDER BY [n1].[Name], [n0].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@p0='?' (Size = 450), @p1='?' (Size = 4000), @p2='?' (DbType = DateTime2), @p3='?' (Size = 4000), @p4='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [Notes] ([Name], [Content], [CreatedAt], [PasswordHash], [UpdatedAt])
+      VALUES (@p0, @p1, @p2, @p3, @p4);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@noteName='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [n].[NoteName], [n].[TagId]
+      FROM [NoteTags] AS [n]
+      WHERE [n].[NoteName] = @noteName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Name]
+      FROM [NoteTags] AS [n]
+      INNER JOIN [Tags] AS [t] ON [n].[TagId] = [t].[Id]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [t].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@p='?' (DbType = Int32), @name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(@p) [n].[Id], [n].[CreatedAt]
+      FROM [NoteVersions] AS [n]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [n].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) COUNT(*) AS [Count], MAX([n].[AccessedAt]) AS [LastAccessedAt]
+      FROM [NoteAccessLogs] AS [n]
+      WHERE [n].[NoteName] = @name
+      GROUP BY [n].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [n1].[Name], [n1].[Content], [n1].[CreatedAt], [n1].[PasswordHash], [n1].[UpdatedAt], [n0].[NoteName], [n0].[TagId]
+      FROM (
+          SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+          FROM [Notes] AS [n]
+          WHERE [n].[Name] = @name
+      ) AS [n1]
+      LEFT JOIN [NoteTags] AS [n0] ON [n1].[Name] = [n0].[NoteName]
+      ORDER BY [n1].[Name], [n0].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@p0='?' (Size = 450), @p1='?' (Size = 4000), @p2='?' (DbType = DateTime2), @p3='?' (Size = 4000), @p4='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [Notes] ([Name], [Content], [CreatedAt], [PasswordHash], [UpdatedAt])
+      VALUES (@p0, @p1, @p2, @p3, @p4);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@noteName='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [n].[NoteName], [n].[TagId]
+      FROM [NoteTags] AS [n]
+      WHERE [n].[NoteName] = @noteName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@tagName='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [t].[Id], [t].[Name]
+      FROM [Tags] AS [t]
+      WHERE [t].[Name] = @tagName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (6ms) [Parameters=[@p0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [Tags] ([Name])
+      OUTPUT INSERTED.[Id]
+      VALUES (@p0);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@p1='?' (Size = 450), @p2='?' (DbType = Int32)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [NoteTags] ([NoteName], [TagId])
+      VALUES (@p1, @p2);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Name]
+      FROM [NoteTags] AS [n]
+      INNER JOIN [Tags] AS [t] ON [n].[TagId] = [t].[Id]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [t].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p='?' (DbType = Int32), @name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(@p) [n].[Id], [n].[CreatedAt]
+      FROM [NoteVersions] AS [n]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [n].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) COUNT(*) AS [Count], MAX([n].[AccessedAt]) AS [LastAccessedAt]
+      FROM [NoteAccessLogs] AS [n]
+      WHERE [n].[NoteName] = @name
+      GROUP BY [n].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [n1].[Name], [n1].[Content], [n1].[CreatedAt], [n1].[PasswordHash], [n1].[UpdatedAt], [n0].[NoteName], [n0].[TagId]
+      FROM (
+          SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+          FROM [Notes] AS [n]
+          WHERE [n].[Name] = @name
+      ) AS [n1]
+      LEFT JOIN [NoteTags] AS [n0] ON [n1].[Name] = [n0].[NoteName]
+      ORDER BY [n1].[Name], [n0].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@noteName='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [n].[NoteName], [n].[TagId]
+      FROM [NoteTags] AS [n]
+      WHERE [n].[NoteName] = @noteName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (1ms) [Parameters=[@tagName='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [t].[Id], [t].[Name]
+      FROM [Tags] AS [t]
+      WHERE [t].[Name] = @tagName
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (7ms) [Parameters=[@p1='?' (Size = 450), @p0='?' (DbType = DateTime2)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      UPDATE [Notes] SET [UpdatedAt] = @p0
+      OUTPUT 1
+      WHERE [Name] = @p1;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Name]
+      FROM [NoteTags] AS [n]
+      INNER JOIN [Tags] AS [t] ON [n].[TagId] = [t].[Id]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [t].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@p='?' (DbType = Int32), @name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(@p) [n].[Id], [n].[CreatedAt]
+      FROM [NoteVersions] AS [n]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [n].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) COUNT(*) AS [Count], MAX([n].[AccessedAt]) AS [LastAccessedAt]
+      FROM [NoteAccessLogs] AS [n]
+      WHERE [n].[NoteName] = @name
+      GROUP BY [n].[NoteName]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (5ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 45), @p2='?' (Size = 450), @p3='?' (Size = 4000)], CommandType='Text', CommandTimeout='30']
+      SET IMPLICIT_TRANSACTIONS OFF;
+      SET NOCOUNT ON;
+      INSERT INTO [NoteAccessLogs] ([AccessedAt], [IpAddress], [NoteName], [UserAgent])
+      OUTPUT INSERTED.[Id]
+      VALUES (@p0, @p1, @p2, @p3);
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (2ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) [n].[Name], [n].[Content], [n].[CreatedAt], [n].[PasswordHash], [n].[UpdatedAt]
+      FROM [Notes] AS [n]
+      WHERE [n].[Name] = @name
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT [t].[Name]
+      FROM [NoteTags] AS [n]
+      INNER JOIN [Tags] AS [t] ON [n].[TagId] = [t].[Id]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [t].[Name]
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@p='?' (DbType = Int32), @name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(@p) [n].[Id], [n].[CreatedAt]
+      FROM [NoteVersions] AS [n]
+      WHERE [n].[NoteName] = @name
+      ORDER BY [n].[CreatedAt] DESC
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (4ms) [Parameters=[@name='?' (Size = 450)], CommandType='Text', CommandTimeout='30']
+      SELECT TOP(2) COUNT(*) AS [Count], MAX([n].[AccessedAt]) AS [LastAccessedAt]
+      FROM [NoteAccessLogs] AS [n]
+      WHERE [n].[NoteName] = @name
+      GROUP BY [n].[NoteName]

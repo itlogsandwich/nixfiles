@@ -1,0 +1,34 @@
+@model TagDetailsViewModel
+
+@{
+    ViewData["Title"] = $"#{Model.Name}";
+}
+
+<section class="tag-shell">
+    <div class="note-heading">
+        <div>
+            <span class="eyebrow">Tag</span>
+            <h1>#@Model.Name</h1>
+        </div>
+        <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">New path</a>
+    </div>
+
+    @if (Model.Nixes.Count == 0)
+    {
+        <p class="empty-panel">No Nix has this tag anymore.</p>
+    }
+    else
+    {
+        <div class="tag-results">
+            @foreach (var nix in Model.Nixes)
+            {
+                <a class="tag-result" asp-controller="Notes" asp-action="Open" asp-route-name="@nix.Name">
+                    <span>/@nix.Name</span>
+                    <small>
+                        @(nix.IsProtected ? "Protected" : "Public") · Updated @nix.UpdatedAt.ToLocalTime().ToString("g")
+                    </small>
+                </a>
+            }
+        </div>
+    }
+</section>

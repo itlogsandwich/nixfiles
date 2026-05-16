@@ -1,0 +1,231 @@
+@model NoteEditorViewModel
+
+@{
+    ViewData["Title"] = Model.IsNew ? $"Create {Model.Name}" : Model.Name;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+}
+
+<section class="note-shell">
+    <div class="note-heading">
+        <div>
+            <span class="eyebrow">/@Model.Name</span>
+            <h1>@(Model.IsNew ? "Create Nix" : "Edit Nix")</h1>
+        </div>
+        <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">New path</a>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger" role="alert">@Model.ErrorMessage</div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
+    {
+        <div class="alert alert-success" role="status">@Model.StatusMessage</div>
+    }
+
+    <div class="editor-layout">
+        <form asp-controller="Notes" asp-action="Save" asp-route-name="@Model.Name" method="post" class="note-form">
+            <input asp-for="Name" type="hidden" />
+            <input asp-for="IsNew" type="hidden" />
+            <input asp-for="IsProtected" type="hidden" />
+            <input id="imageInput" type="file" accept="image/*" multiple hidden />
+
+            <div class="editor-frame">
+                <textarea asp-for="Content" id="Content" rows="18"></textarea>
+            </div>
+
+            <div class="save-bar">
+                <div class="tag-field">
+                    <label asp-for="TagsText" class="form-label">Tags</label>
+                    <input asp-for="TagsText" class="form-control" placeholder="school, todo, draft" autocomplete="off" />
+                </div>
+                @if (Model.IsNew)
+                {
+                    <div class="password-field">
+                        <label asp-for="Password" class="form-label">Password</label>
+                        <input asp-for="Password" class="form-control" type="password" autocomplete="new-password" placeholder="Optional" />
+                    </div>
+                }
+                else if (Model.IsProtected)
+                {
+                    <div class="password-field">
+                        <label asp-for="Password" class="form-label">Password</label>
+                        <input asp-for="Password" class="form-control" type="password" autocomplete="current-password" required />
+                    </div>
+                }
+                <button class="btn btn-primary" type="submit">Save</button>
+            </div>
+        </form>
+
+        @if (!Model.IsNew)
+        {
+            <aside class="nix-panel" aria-label="Nix details">
+                <section class="panel-section">
+                    <h2>Insights</h2>
+                    <dl class="insight-list">
+                        <div>
+                            <dt>Views</dt>
+                            <dd>@Model.ViewCount</dd>
+                        </div>
+                        <div>
+                            <dt>Last opened</dt>
+                            <dd>@(Model.LastAccessedAt?.ToLocalTime().ToString("g") ?? "Never")</dd>
+                        </div>
+                        <div>
+                            <dt>Updated</dt>
+                            <dd>@(Model.UpdatedAt?.ToLocalTime().ToString("g") ?? "-")</dd>
+                        </div>
+                    </dl>
+                </section>
+
+                <section class="panel-section">
+                    <h2>Tags</h2>
+                    @if (Model.Tags.Count > 0)
+                    {
+                        <div class="tag-list">
+                            @foreach (var tag in Model.Tags)
+                            {
+                                <a asp-controller="Notes" asp-action="Tagged" asp-route-tagName="@tag">#@tag</a>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="empty-panel">No tags yet.</p>
+                    }
+                </section>
+
+                <section class="panel-section">
+                    <h2>History</h2>
+                    @if (Model.Versions.Count > 0)
+                    {
+                        <div class="history-list">
+                            @foreach (var version in Model.Versions)
+                            {
+                                <form asp-controller="Notes" asp-action="Restore" asp-route-name="@Model.Name" asp-route-versionId="@version.Id" method="post" class="history-item">
+                                    <span>@version.CreatedAt.ToLocalTime().ToString("g")</span>
+                                    @if (Model.IsProtected)
+                                    {
+                                        <input name="password" class="form-control form-control-sm" type="password" placeholder="Password" required />
+                                    }
+                                    <button class="btn btn-sm btn-outline-secondary" type="submit">Restore</button>
+                                </form>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="empty-panel">No previous versions yet.</p>
+                    }
+                </section>
+            </aside>
+        }
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+    <script>
+        const imageInput = document.getElementById("imageInput");
+        const noteName = @Json.Serialize(Model.Name);
+        const customImageButton = {
+            name: "image",
+            action: function () {
+                imageInput.click();
+            },
+            className: "fa fa-picture-o",
+            title: "Attach image"
+        };
+
+        const editor = new EasyMDE({
+            element: document.getElementById("Content"),
+            spellChecker: false,
+            status: false,
+            autofocus: true,
+            lineWrapping: true,
+            toolbar: [
+                "bold", "italic", "heading", "|",
+                "quote", "unordered-list", "ordered-list", "|",
+                "link", customImageButton, "|",
+                "preview", "side-by-side", "fullscreen", "|",
+                "guide"
+            ],
+            sanitizerFunction: function (renderedHtml) {
+                return DOMPurify.sanitize(renderedHtml, {
+                    ADD_DATA_URI_TAGS: ["img"]
+                });
+            }
+        });
+
+        function insertImageFile(file) {
+            if (!file || !file.type.startsWith("image/")) {
+                return;
+            }
+
+            const token = document.querySelector("input[name='__RequestVerificationToken']").value;
+            const formData = new FormData();
+            formData.append("__RequestVerificationToken", token);
+            formData.append("image", file);
+
+            fetch(`/${encodeURIComponent(noteName)}/image`, {
+                method: "POST",
+                headers: {
+                    "RequestVerificationToken": token
+                },
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Image upload failed.");
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    const safeName = (file.name || "image").replace(/[^\w.-]+/g, "-");
+                    const markdown = `![${safeName}](${result.url})`;
+                    editor.codemirror.replaceSelection(`${markdown}\n`);
+                    editor.codemirror.focus();
+                    editor.codemirror.save();
+                })
+                .catch(() => {
+                    window.alert("The image could not be attached.");
+                });
+        }
+
+        function insertImageFiles(files) {
+            Array.from(files)
+                .filter(file => file.type.startsWith("image/"))
+                .forEach(insertImageFile);
+        }
+
+        imageInput.addEventListener("change", function () {
+            insertImageFiles(imageInput.files);
+            imageInput.value = "";
+        });
+
+        editor.codemirror.on("paste", function (_, event) {
+            const files = event.clipboardData?.files;
+            if (files && Array.from(files).some(file => file.type.startsWith("image/"))) {
+                event.preventDefault();
+                insertImageFiles(files);
+            }
+        });
+
+        editor.codemirror.on("drop", function (_, event) {
+            const files = event.dataTransfer?.files;
+            if (files && Array.from(files).some(file => file.type.startsWith("image/"))) {
+                event.preventDefault();
+                insertImageFiles(files);
+            }
+        });
+
+        document.querySelector(".note-form").addEventListener("submit", function () {
+            editor.codemirror.save();
+        });
+    </script>
+}

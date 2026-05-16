@@ -1,0 +1,43 @@
+@{
+    ViewData["Title"] = "Open Nix";
+}
+
+<section class="landing">
+    <div class="landing-copy">
+        <h1>NixFiles</h1>
+        <p>Open a Nix by name. If it does not exist yet, it starts as a new Nix.</p>
+    </div>
+
+    <form id="nixLauncher" class="note-launcher">
+        <label class="form-label" for="nixName">Nix name</label>
+        <div class="input-group">
+            <input id="nixName"
+                   class="form-control"
+                   type="text"
+                   maxlength="450"
+                   pattern="[A-Za-z0-9-]+"
+                   placeholder="team-nix"
+                   autocomplete="off"
+                   required />
+            <button class="btn btn-primary" type="submit">Open</button>
+        </div>
+        <div class="form-text">Letters, numbers, and dashes only.</div>
+    </form>
+</section>
+
+@section Scripts {
+    <script>
+        document.getElementById("nixLauncher").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const input = document.getElementById("nixName");
+            const nixName = input.value.trim();
+
+            if (/^[A-Za-z0-9-]{1,450}$/.test(nixName)) {
+                window.location.href = "/" + encodeURIComponent(nixName);
+            } else {
+                input.reportValidity();
+            }
+        });
+    </script>
+}
