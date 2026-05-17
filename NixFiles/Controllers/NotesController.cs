@@ -128,15 +128,10 @@ public class NotesController(
             });
         }
 
-        await LogAccessAsync(note.Name);
-        await dbContext.SaveChangesAsync();
         MarkNoteUnlocked(note);
 
-        var viewModel = await BuildEditorModelAsync(note.Name);
-        viewModel.IsProtected = true;
-        viewModel.StatusMessage = "Unlocked for this browser session.";
-
-        return View("Editor", viewModel);
+        TempData["StatusMessage"] = "Unlocked for this browser session.";
+        return RedirectToAction(nameof(Open), new { name = note.Name });
     }
 
     [HttpPost]
@@ -267,9 +262,8 @@ public class NotesController(
         note.UpdatedAt = DateTime.UtcNow;
         await dbContext.SaveChangesAsync();
 
-        var viewModel = await BuildEditorModelAsync(note.Name);
-        viewModel.StatusMessage = $"Restored version from {version.CreatedAt:g}.";
-        return View("Editor", viewModel);
+        TempData["StatusMessage"] = $"Restored version from {version.CreatedAt:g}.";
+        return RedirectToAction(nameof(Open), new { name = note.Name });
     }
 
     [HttpPost]

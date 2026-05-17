@@ -36,8 +36,6 @@
 
 html {
   font-size: 14px;
-  position: relative;
-  min-height: 100%;
 }
 
 @media (min-width: 768px) {
@@ -49,12 +47,17 @@ html {
 body {
   position: relative;
   isolation: isolate;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
-  margin-bottom: 72px;
   background: linear-gradient(135deg, var(--nix-bg), var(--nix-surface));
   color: var(--nix-text);
   font-family: var(--nix-font-body);
   transition: background-color .2s ease, color .2s ease;
+}
+
+body > .container {
+  flex: 1 0 auto;
 }
 
 body::before,
@@ -291,11 +294,12 @@ main {
 }
 
 .footer {
-  position: absolute;
-  bottom: 0;
+  flex-shrink: 0;
   width: 100%;
+  margin-top: 48px;
+  padding: 24px 0 28px;
+  border-top: 1px solid var(--nix-border);
   white-space: nowrap;
-  line-height: 60px;
   color: var(--nix-muted) !important;
 }
 
