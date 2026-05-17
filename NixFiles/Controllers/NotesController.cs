@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -38,7 +39,6 @@ public class NotesController(
         }
 
         var note = await dbContext.Notes
-            .AsNoTracking()
             .SingleOrDefaultAsync(current => current.Name == name);
 
         if (note is null)
@@ -46,11 +46,17 @@ public class NotesController(
             return View("Editor", new NoteEditorViewModel
             {
                 Name = name,
-                IsNew = true
+                IsNew = true,
+                ExpiresIn = 0
             });
         }
 
-        if (!string.IsNullOrEmpty(note.PasswordHash))
+        if (await ExpireIfNeededAsync(note))
+        {
+            return View("Expired", name);
+        }
+
+        if (!string.IsNullOrEmpty(note.PasswordHash) && !IsNoteUnlocked(note))
         {
             return View("Unlock", new UnlockNoteViewModel { Name = name });
         }
@@ -58,7 +64,10 @@ public class NotesController(
         await LogAccessAsync(note.Name);
         await dbContext.SaveChangesAsync();
 
-        return View("Editor", await BuildEditorModelAsync(note.Name));
+        var viewModel = await BuildEditorModelAsync(note.Name);
+        viewModel.StatusMessage = TempData["StatusMessage"] as string;
+
+        return View("Editor", viewModel);
     }
 
     [HttpPost]
@@ -71,12 +80,16 @@ public class NotesController(
         }
 
         var note = await dbContext.Notes
-            .AsNoTracking()
             .SingleOrDefaultAsync(current => current.Name == name);
 
         if (note is null)
         {
             return RedirectToAction(nameof(Open), new { name });
+        }
+
+        if (await ExpireIfNeededAsync(note))
+        {
+            return View("Expired", name);
         }
 
         if (string.IsNullOrEmpty(note.PasswordHash))
@@ -96,16 +109,18 @@ public class NotesController(
 
         await LogAccessAsync(note.Name);
         await dbContext.SaveChangesAsync();
+        MarkNoteUnlocked(note);
 
         var viewModel = await BuildEditorModelAsync(note.Name);
         viewModel.IsProtected = true;
-        viewModel.StatusMessage = "Unlocked. Enter the password again when saving changes.";
+        viewModel.StatusMessage = "Unlocked for this browser session.";
 
         return View("Editor", viewModel);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Consumes("application/x-www-form-urlencoded", "multipart/form-data")]
     public async Task<IActionResult> Save(string name, NoteEditorViewModel model)
     {
         if (!IsValidName(name))
@@ -113,71 +128,62 @@ public class NotesController(
             return NotFound();
         }
 
-        var content = model.Content ?? string.Empty;
-        if (string.IsNullOrWhiteSpace(content))
+        var result = await SaveNoteAsync(name, model.Content, model.Password, model.TagsText, model.ExpiresIn);
+
+        if (result.Status == SaveNoteStatus.ContentRequired)
         {
             model.Name = name;
             model.ErrorMessage = "Content is required.";
             return View("Editor", model);
         }
 
-        var note = await dbContext.Notes
-            .Include(current => current.NoteTags)
-            .SingleOrDefaultAsync(current => current.Name == name);
-
-        if (note is null)
+        if (result.Status == SaveNoteStatus.Expired)
         {
-            note = new Note
-            {
-                Name = name,
-                Content = content,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            if (!string.IsNullOrWhiteSpace(model.Password))
-            {
-                note.PasswordHash = passwordHasher.HashPassword(note, model.Password);
-            }
-
-            dbContext.Notes.Add(note);
-            await dbContext.SaveChangesAsync();
-            await UpdateTagsAsync(note.Name, model.TagsText);
-            await dbContext.SaveChangesAsync();
-
-            var viewModel = await BuildEditorModelAsync(note.Name);
-            viewModel.StatusMessage = "Nix created.";
-            return View("Editor", viewModel);
+            return View("Expired", name);
         }
 
-        if (!string.IsNullOrEmpty(note.PasswordHash) && !PasswordMatches(note, model.Password))
+        if (result.Status == SaveNoteStatus.PasswordRequired)
         {
-            var viewModel = await BuildEditorModelAsync(note.Name);
-            viewModel.Content = content;
+            var viewModel = await BuildEditorModelAsync(name);
+            viewModel.Content = model.Content ?? string.Empty;
             viewModel.IsProtected = true;
             viewModel.TagsText = model.TagsText;
+            viewModel.ExpiresIn = model.ExpiresIn;
             viewModel.ErrorMessage = "Enter the Nix password to save changes.";
             return View("Editor", viewModel);
         }
 
-        if (!string.Equals(note.Content, content, StringComparison.Ordinal))
+        TempData["StatusMessage"] = result.Created ? "Nix created." : "Saved.";
+        return RedirectToAction(nameof(Open), new { name });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Consumes("application/json")]
+    [ActionName(nameof(Save))]
+    public async Task<IActionResult> SaveJson(string name, [FromBody] SaveNoteRequest model)
+    {
+        if (!IsValidName(name))
         {
-            dbContext.NoteVersions.Add(new NoteVersion
-            {
-                NoteName = note.Name,
-                Content = note.Content,
-                CreatedAt = DateTime.UtcNow
-            });
+            return NotFound();
         }
 
-        note.Content = content;
-        note.UpdatedAt = DateTime.UtcNow;
-        await UpdateTagsAsync(note.Name, model.TagsText);
-        await dbContext.SaveChangesAsync();
+        var result = await SaveNoteAsync(name, model.Content, model.Password, model.TagsText, model.ExpiresIn);
 
-        var savedModel = await BuildEditorModelAsync(note.Name);
-        savedModel.StatusMessage = "Saved.";
-        return View("Editor", savedModel);
+        return result.Status switch
+        {
+            SaveNoteStatus.Saved => Json(new
+            {
+                success = true,
+                created = result.Created,
+                updatedAt = result.UpdatedAt,
+                expiresAt = result.ExpiresAt
+            }),
+            SaveNoteStatus.ContentRequired => BadRequest(new { success = false, error = "Content is required." }),
+            SaveNoteStatus.PasswordRequired => Unauthorized(new { success = false, error = "Password is required." }),
+            SaveNoteStatus.Expired => StatusCode(StatusCodes.Status410Gone, new { success = false, error = "This Nix has expired." }),
+            _ => BadRequest(new { success = false, error = "The Nix could not be saved." })
+        };
     }
 
     [HttpPost]
@@ -197,7 +203,12 @@ public class NotesController(
             return NotFound();
         }
 
-        if (!string.IsNullOrEmpty(note.PasswordHash) && !PasswordMatches(note, password))
+        if (await ExpireIfNeededAsync(note))
+        {
+            return View("Expired", name);
+        }
+
+        if (!string.IsNullOrEmpty(note.PasswordHash) && !IsNoteUnlocked(note) && !PasswordMatches(note, password))
         {
             var lockedModel = await BuildEditorModelAsync(note.Name);
             lockedModel.IsProtected = true;
@@ -238,6 +249,12 @@ public class NotesController(
             return BadRequest(new { error = "Invalid Nix name." });
         }
 
+        var note = await dbContext.Notes.SingleOrDefaultAsync(current => current.Name == name);
+        if (note is not null && await ExpireIfNeededAsync(note))
+        {
+            return StatusCode(StatusCodes.Status410Gone, new { error = "This Nix has expired." });
+        }
+
         if (image.Length == 0 || !image.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
         {
             return BadRequest(new { error = "Select an image file." });
@@ -275,6 +292,7 @@ public class NotesController(
             return NotFound();
         }
 
+        var now = DateTime.UtcNow;
         var tag = await dbContext.Tags
             .AsNoTracking()
             .Include(current => current.NoteTags)
@@ -290,7 +308,8 @@ public class NotesController(
         {
             Name = tag.Name,
             Nixes = tag.NoteTags
-                .Where(noteTag => noteTag.Note is not null)
+                .Where(noteTag => noteTag.Note is not null &&
+                    (!noteTag.Note.ExpiresAt.HasValue || noteTag.Note.ExpiresAt > now))
                 .Select(noteTag => new TagNoteViewModel
                 {
                     Name = noteTag.Note!.Name,
@@ -341,19 +360,133 @@ public class NotesController(
             })
             .SingleOrDefaultAsync();
 
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var isBookmarked = userId is not null &&
+            await dbContext.Bookmarks
+                .AsNoTracking()
+                .AnyAsync(bookmark => bookmark.UserId == userId && bookmark.NoteName == name);
+
         return new NoteEditorViewModel
         {
             Name = note.Name,
             Content = note.Content,
             IsProtected = !string.IsNullOrEmpty(note.PasswordHash),
+            IsUnlocked = IsNoteUnlocked(note),
+            IsBookmarked = isBookmarked,
             Tags = tags,
             TagsText = string.Join(", ", tags),
             Versions = versions,
             ViewCount = accessStats?.Count ?? 0,
             LastAccessedAt = accessStats?.LastAccessedAt,
             CreatedAt = note.CreatedAt,
-            UpdatedAt = note.UpdatedAt
+            UpdatedAt = note.UpdatedAt,
+            ExpiresAt = note.ExpiresAt,
+            ExpiresIn = note.ExpiresAt.HasValue ? null : 0
         };
+    }
+
+    private async Task<SaveNoteResult> SaveNoteAsync(
+        string name,
+        string? contentValue,
+        string? password,
+        string? tagsText,
+        int? expiresIn)
+    {
+        var content = contentValue ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            return SaveNoteResult.ContentRequired();
+        }
+
+        var note = await dbContext.Notes
+            .Include(current => current.NoteTags)
+            .SingleOrDefaultAsync(current => current.Name == name);
+
+        var now = DateTime.UtcNow;
+        var created = false;
+
+        if (note is null)
+        {
+            created = true;
+            note = new Note
+            {
+                Name = name,
+                Content = content,
+                CreatedAt = now,
+                UpdatedAt = now
+            };
+
+            if (!string.IsNullOrWhiteSpace(password))
+            {
+                note.PasswordHash = passwordHasher.HashPassword(note, password);
+                MarkNoteUnlocked(note);
+            }
+
+            ApplyExpiration(note, expiresIn, now);
+            dbContext.Notes.Add(note);
+            await dbContext.SaveChangesAsync();
+            await UpdateTagsAsync(note.Name, tagsText);
+            await dbContext.SaveChangesAsync();
+
+            return SaveNoteResult.Saved(created, note.UpdatedAt, note.ExpiresAt);
+        }
+
+        if (await ExpireIfNeededAsync(note))
+        {
+            return SaveNoteResult.Expired();
+        }
+
+        if (!string.IsNullOrEmpty(note.PasswordHash) && !IsNoteUnlocked(note))
+        {
+            if (!PasswordMatches(note, password))
+            {
+                return SaveNoteResult.PasswordRequired();
+            }
+
+            MarkNoteUnlocked(note);
+        }
+
+        if (!string.Equals(note.Content, content, StringComparison.Ordinal))
+        {
+            dbContext.NoteVersions.Add(new NoteVersion
+            {
+                NoteName = note.Name,
+                Content = note.Content,
+                CreatedAt = now
+            });
+        }
+
+        note.Content = content;
+        note.UpdatedAt = now;
+        ApplyExpiration(note, expiresIn, now);
+        await UpdateTagsAsync(note.Name, tagsText);
+        await dbContext.SaveChangesAsync();
+
+        return SaveNoteResult.Saved(created, note.UpdatedAt, note.ExpiresAt);
+    }
+
+    private async Task<bool> ExpireIfNeededAsync(Note note)
+    {
+        if (!note.ExpiresAt.HasValue || note.ExpiresAt > DateTime.UtcNow)
+        {
+            return false;
+        }
+
+        dbContext.Notes.Remove(note);
+        await dbContext.SaveChangesAsync();
+        return true;
+    }
+
+    private static void ApplyExpiration(Note note, int? expiresIn, DateTime now)
+    {
+        if (!expiresIn.HasValue)
+        {
+            return;
+        }
+
+        note.ExpiresAt = expiresIn.Value <= 0
+            ? null
+            : now.AddSeconds(expiresIn.Value);
     }
 
     private async Task UpdateTagsAsync(string noteName, string? tagsText)
@@ -403,6 +536,25 @@ public class NotesController(
             passwordHasher.VerifyHashedPassword(note, note.PasswordHash, password) != PasswordVerificationResult.Failed;
     }
 
+    private bool IsNoteUnlocked(Note note)
+    {
+        return string.IsNullOrEmpty(note.PasswordHash) ||
+            HttpContext.Session.GetString(GetUnlockSessionKey(note.Name)) == note.PasswordHash;
+    }
+
+    private void MarkNoteUnlocked(Note note)
+    {
+        if (!string.IsNullOrEmpty(note.PasswordHash))
+        {
+            HttpContext.Session.SetString(GetUnlockSessionKey(note.Name), note.PasswordHash);
+        }
+    }
+
+    private static string GetUnlockSessionKey(string noteName)
+    {
+        return $"UnlockedNote:{noteName}";
+    }
+
     private static IReadOnlyList<string> ParseTags(string? tagsText)
     {
         if (string.IsNullOrWhiteSpace(tagsText))
@@ -436,5 +588,29 @@ public class NotesController(
     private static bool IsValidName(string? name)
     {
         return !string.IsNullOrWhiteSpace(name) && NoteNamePattern.IsMatch(name);
+    }
+
+    private enum SaveNoteStatus
+    {
+        Saved,
+        ContentRequired,
+        PasswordRequired,
+        Expired
+    }
+
+    private sealed record SaveNoteResult(
+        SaveNoteStatus Status,
+        bool Created = false,
+        DateTime? UpdatedAt = null,
+        DateTime? ExpiresAt = null)
+    {
+        public static SaveNoteResult Saved(bool created, DateTime updatedAt, DateTime? expiresAt) =>
+            new(SaveNoteStatus.Saved, created, updatedAt, expiresAt);
+
+        public static SaveNoteResult ContentRequired() => new(SaveNoteStatus.ContentRequired);
+
+        public static SaveNoteResult PasswordRequired() => new(SaveNoteStatus.PasswordRequired);
+
+        public static SaveNoteResult Expired() => new(SaveNoteStatus.Expired);
     }
 }

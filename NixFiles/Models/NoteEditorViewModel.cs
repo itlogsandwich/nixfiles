@@ -12,6 +12,10 @@ public class NoteEditorViewModel
 
     public bool IsProtected { get; set; }
 
+    public bool IsUnlocked { get; set; }
+
+    public bool IsBookmarked { get; set; }
+
     public string TagsText { get; set; } = string.Empty;
 
     public IReadOnlyList<string> Tags { get; set; } = [];
@@ -25,6 +29,10 @@ public class NoteEditorViewModel
     public DateTime? CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
+
+    public DateTime? ExpiresAt { get; set; }
+
+    public int? ExpiresIn { get; set; }
 
     public string? ErrorMessage { get; set; }
 

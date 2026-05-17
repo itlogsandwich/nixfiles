@@ -1,0 +1,19 @@
+@model string
+
+@{
+    ViewData["Title"] = "Nix expired";
+}
+
+<section class="unlock-shell">
+    <div class="note-heading">
+        <div>
+            <span class="eyebrow">/@Model</span>
+            <h1>Nix expired</h1>
+        </div>
+        <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">New path</a>
+    </div>
+
+    <div class="alert alert-danger" role="alert">
+        This Nix has expired and is no longer available.
+    </div>
+</section>

@@ -1,0 +1,34 @@
+@model BookmarkListViewModel
+
+@{
+    ViewData["Title"] = "Bookmarks";
+}
+
+<section class="tag-shell">
+    <div class="note-heading">
+        <div>
+            <span class="eyebrow">Saved paths</span>
+            <h1>Bookmarks</h1>
+        </div>
+        <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">New path</a>
+    </div>
+
+    @if (Model.Bookmarks.Count == 0)
+    {
+        <p class="empty-panel">No bookmarks yet.</p>
+    }
+    else
+    {
+        <div class="tag-results">
+            @foreach (var bookmark in Model.Bookmarks)
+            {
+                <a class="tag-result" asp-controller="Notes" asp-action="Open" asp-route-name="@bookmark.Name">
+                    <span>/@bookmark.Name</span>
+                    <small>
+                        @(bookmark.IsProtected ? "Protected" : "Public") - Saved @bookmark.BookmarkedAt.ToLocalTime().ToString("g")
+                    </small>
+                </a>
+            }
+        </div>
+    }
+</section>

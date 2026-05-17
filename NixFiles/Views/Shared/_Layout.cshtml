@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - NixFiles</title>
     <script type="importmap"></script>
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("nixfiles-theme");
+            const theme = savedTheme === "light" ? "light" : "dark";
+            document.documentElement.dataset.theme = theme;
+            document.documentElement.dataset.bsTheme = theme;
+        })();
+    </script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/NixFiles.styles.css" asp-append-version="true" />
@@ -15,6 +23,27 @@
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">NixFiles</a>
+                <div class="nav-actions">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <a class="btn btn-outline-secondary btn-sm" asp-controller="Bookmarks" asp-action="Index">Bookmarks</a>
+                        <form asp-controller="Account" asp-action="Logout" method="post">
+                            <button class="btn btn-outline-secondary btn-sm" type="submit">Log out</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <a class="btn btn-outline-secondary btn-sm" asp-controller="Account" asp-action="Login">Log in</a>
+                        <a class="btn btn-primary btn-sm" asp-controller="Account" asp-action="Register">Register</a>
+                    }
+                    <button id="themeToggle" class="btn theme-toggle" type="button" aria-label="Switch to light mode">
+                    <span class="theme-toggle-track" aria-hidden="true">
+                        <span class="theme-toggle-icon theme-toggle-sun">☀</span>
+                        <span class="theme-toggle-icon theme-toggle-moon">☾</span>
+                        <span class="theme-toggle-thumb"></span>
+                    </span>
+                    </button>
+                </div>
             </div>
         </nav>
     </header>

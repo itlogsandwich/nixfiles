@@ -14,7 +14,17 @@
             <span class="eyebrow">/@Model.Name</span>
             <h1>@(Model.IsNew ? "Create Nix" : "Edit Nix")</h1>
         </div>
-        <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">New path</a>
+        <div class="heading-actions">
+            @if (!Model.IsNew && User.Identity?.IsAuthenticated == true)
+            {
+                <form asp-controller="Bookmarks" asp-action="Toggle" method="post">
+                    <input name="noteName" type="hidden" value="@Model.Name" />
+                    <input name="returnUrl" type="hidden" value="@Url.Action("Open", "Notes", new { name = Model.Name })" />
+                    <button class="btn btn-outline-secondary" type="submit">@(Model.IsBookmarked ? "Bookmarked" : "Bookmark")</button>
+                </form>
+            }
+            <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">New path</a>
+        </div>
     </div>
 
     @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
@@ -43,6 +53,19 @@
                     <label asp-for="TagsText" class="form-label">Tags</label>
                     <input asp-for="TagsText" class="form-control" placeholder="school, todo, draft" autocomplete="off" />
                 </div>
+                <div class="expiry-field">
+                    <label asp-for="ExpiresIn" class="form-label">Expires In</label>
+                    <select asp-for="ExpiresIn" class="form-control">
+                        @if (!Model.IsNew && Model.ExpiresAt.HasValue)
+                        {
+                            <option value="">Keep current</option>
+                        }
+                        <option value="0">Never</option>
+                        <option value="3600">1 hour</option>
+                        <option value="86400">1 day</option>
+                        <option value="604800">7 days</option>
+                    </select>
+                </div>
                 @if (Model.IsNew)
                 {
                     <div class="password-field">
@@ -50,13 +73,14 @@
                         <input asp-for="Password" class="form-control" type="password" autocomplete="new-password" placeholder="Optional" />
                     </div>
                 }
-                else if (Model.IsProtected)
+                else if (Model.IsProtected && !Model.IsUnlocked)
                 {
                     <div class="password-field">
                         <label asp-for="Password" class="form-label">Password</label>
                         <input asp-for="Password" class="form-control" type="password" autocomplete="current-password" required />
                     </div>
                 }
+                <div id="saveStatus" class="save-status" role="status" aria-live="polite">Idle</div>
                 <button class="btn btn-primary" type="submit">Save</button>
             </div>
         </form>
@@ -78,6 +102,10 @@
                         <div>
                             <dt>Updated</dt>
                             <dd>@(Model.UpdatedAt?.ToLocalTime().ToString("g") ?? "-")</dd>
+                        </div>
+                        <div>
+                            <dt>Expires</dt>
+                            <dd>@(Model.ExpiresAt?.ToLocalTime().ToString("g") ?? "Never")</dd>
                         </div>
                     </dl>
                 </section>
@@ -108,7 +136,7 @@
                             {
                                 <form asp-controller="Notes" asp-action="Restore" asp-route-name="@Model.Name" asp-route-versionId="@version.Id" method="post" class="history-item">
                                     <span>@version.CreatedAt.ToLocalTime().ToString("g")</span>
-                                    @if (Model.IsProtected)
+                                    @if (Model.IsProtected && !Model.IsUnlocked)
                                     {
                                         <input name="password" class="form-control form-control-sm" type="password" placeholder="Password" required />
                                     }
@@ -133,6 +161,21 @@
     <script>
         const imageInput = document.getElementById("imageInput");
         const noteName = @Json.Serialize(Model.Name);
+        const contentInput = document.getElementById("Content");
+        const noteForm = document.querySelector(".note-form");
+        const tagsInput = document.getElementById("TagsText");
+        const passwordInput = document.getElementById("Password");
+        const expiresInput = document.getElementById("ExpiresIn");
+        const saveStatus = document.getElementById("saveStatus");
+        const requestToken = noteForm.querySelector("input[name='__RequestVerificationToken']").value;
+        const draftKey = `draft-${window.location.pathname}`;
+        const savedDraft = localStorage.getItem(draftKey);
+
+        if (savedDraft && !contentInput.value.trim()) {
+            contentInput.value = savedDraft;
+            saveStatus.innerText = "Draft restored";
+        }
+
         const customImageButton = {
             name: "image",
             action: function () {
@@ -143,7 +186,7 @@
         };
 
         const editor = new EasyMDE({
-            element: document.getElementById("Content"),
+            element: contentInput,
             spellChecker: false,
             status: false,
             autofocus: true,
@@ -162,20 +205,113 @@
             }
         });
 
+        let autoSaveTimeout = null;
+        let isAutoSaving = false;
+        let pendingAutoSave = false;
+        let lastAutoSaveBody = null;
+
+        function setSaveStatus(message) {
+            saveStatus.innerText = message;
+        }
+
+        function getExpiryValue() {
+            if (!expiresInput || expiresInput.value === "") {
+                return null;
+            }
+
+            const expiresIn = Number.parseInt(expiresInput.value, 10);
+            return Number.isNaN(expiresIn) ? null : expiresIn;
+        }
+
+        function buildAutoSaveBody() {
+            editor.codemirror.save();
+
+            return JSON.stringify({
+                content: contentInput.value,
+                password: passwordInput ? passwordInput.value : null,
+                tagsText: tagsInput ? tagsInput.value : null,
+                expiresIn: getExpiryValue()
+            });
+        }
+
+        function scheduleAutoSave(message) {
+            clearTimeout(autoSaveTimeout);
+            localStorage.setItem(draftKey, contentInput.value);
+            setSaveStatus(message || "Typing...");
+
+            autoSaveTimeout = setTimeout(function () {
+                autoSave();
+            }, 2000);
+        }
+
+        async function autoSave() {
+            if (isAutoSaving) {
+                pendingAutoSave = true;
+                return;
+            }
+
+            const body = buildAutoSaveBody();
+            if (body === lastAutoSaveBody) {
+                setSaveStatus("Saved");
+                return;
+            }
+
+            isAutoSaving = true;
+            setSaveStatus("Saving...");
+
+            try {
+                const response = await fetch(`/${encodeURIComponent(noteName)}/save`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "RequestVerificationToken": requestToken
+                    },
+                    body
+                });
+
+                if (response.status === 401) {
+                    setSaveStatus("Password needed");
+                    return;
+                }
+
+                if (response.status === 410) {
+                    setSaveStatus("Expired");
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error("Auto-save failed.");
+                }
+
+                lastAutoSaveBody = body;
+                localStorage.removeItem(draftKey);
+                setSaveStatus("Saved");
+            }
+            catch {
+                setSaveStatus("Error saving");
+            }
+            finally {
+                isAutoSaving = false;
+                if (pendingAutoSave) {
+                    pendingAutoSave = false;
+                    scheduleAutoSave("Typing...");
+                }
+            }
+        }
+
         function insertImageFile(file) {
             if (!file || !file.type.startsWith("image/")) {
                 return;
             }
 
-            const token = document.querySelector("input[name='__RequestVerificationToken']").value;
             const formData = new FormData();
-            formData.append("__RequestVerificationToken", token);
+            formData.append("__RequestVerificationToken", requestToken);
             formData.append("image", file);
 
             fetch(`/${encodeURIComponent(noteName)}/image`, {
                 method: "POST",
                 headers: {
-                    "RequestVerificationToken": token
+                    "RequestVerificationToken": requestToken
                 },
                 body: formData
             })
@@ -191,6 +327,7 @@
                     editor.codemirror.replaceSelection(`${markdown}\n`);
                     editor.codemirror.focus();
                     editor.codemirror.save();
+                    scheduleAutoSave("Typing...");
                 })
                 .catch(() => {
                     window.alert("The image could not be attached.");
@@ -224,7 +361,24 @@
             }
         });
 
-        document.querySelector(".note-form").addEventListener("submit", function () {
+        editor.codemirror.on("change", function () {
+            editor.codemirror.save();
+            scheduleAutoSave("Typing...");
+        });
+
+        if (tagsInput) {
+            tagsInput.addEventListener("input", function () {
+                scheduleAutoSave("Editing tags...");
+            });
+        }
+
+        if (expiresInput) {
+            expiresInput.addEventListener("change", function () {
+                scheduleAutoSave("Updating expiry...");
+            });
+        }
+
+        noteForm.addEventListener("submit", function () {
             editor.codemirror.save();
         });
     </script>

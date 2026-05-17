@@ -1,4 +1,21 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+const themeToggle = document.getElementById("themeToggle");
 
-// Write your JavaScript code.
+function setTheme(theme) {
+    const normalizedTheme = theme === "light" ? "light" : "dark";
+    document.documentElement.dataset.theme = normalizedTheme;
+    document.documentElement.dataset.bsTheme = normalizedTheme;
+    localStorage.setItem("nixfiles-theme", normalizedTheme);
+
+    if (themeToggle) {
+        const isDark = normalizedTheme === "dark";
+        themeToggle.setAttribute("aria-label", `Switch to ${isDark ? "light" : "dark"} mode`);
+        themeToggle.setAttribute("title", `Switch to ${isDark ? "light" : "dark"} mode`);
+    }
+}
+
+setTheme(document.documentElement.dataset.theme);
+
+themeToggle?.addEventListener("click", function () {
+    const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+});

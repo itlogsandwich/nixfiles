@@ -1,11 +1,14 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using NixFiles.Models;
 
 namespace NixFiles.Data;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<ApplicationUser>(options)
 {
     public DbSet<Note> Notes => Set<Note>();
+
+    public DbSet<Bookmark> Bookmarks => Set<Bookmark>();
 
     public DbSet<NoteVersion> NoteVersions => Set<NoteVersion>();
 
@@ -17,6 +20,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<Note>(entity =>
         {
             entity.HasKey(note => note.Name);
@@ -33,6 +38,35 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
             entity.Property(note => note.UpdatedAt)
                 .HasDefaultValueSql("SYSUTCDATETIME()");
+        });
+
+        modelBuilder.Entity<Bookmark>(entity =>
+        {
+            entity.HasKey(bookmark => bookmark.Id);
+
+            entity.Property(bookmark => bookmark.NoteName)
+                .HasMaxLength(450)
+                .IsRequired();
+
+            entity.Property(bookmark => bookmark.UserId)
+                .HasMaxLength(450)
+                .IsRequired();
+
+            entity.Property(bookmark => bookmark.CreatedAt)
+                .HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasIndex(bookmark => new { bookmark.UserId, bookmark.NoteName })
+                .IsUnique();
+
+            entity.HasOne(bookmark => bookmark.User)
+                .WithMany(user => user.Bookmarks)
+                .HasForeignKey(bookmark => bookmark.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(bookmark => bookmark.Note)
+                .WithMany(note => note.Bookmarks)
+                .HasForeignKey(bookmark => bookmark.NoteName)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<NoteVersion>(entity =>
