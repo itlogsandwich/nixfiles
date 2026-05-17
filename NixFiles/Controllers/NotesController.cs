@@ -70,6 +70,35 @@ public class NotesController(
         return View("Editor", viewModel);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> Unlock(string name)
+    {
+        if (!IsValidName(name))
+        {
+            return NotFound();
+        }
+
+        var note = await dbContext.Notes
+            .SingleOrDefaultAsync(current => current.Name == name);
+
+        if (note is null)
+        {
+            return RedirectToAction(nameof(Open), new { name });
+        }
+
+        if (await ExpireIfNeededAsync(note))
+        {
+            return View("Expired", name);
+        }
+
+        if (string.IsNullOrEmpty(note.PasswordHash) || IsNoteUnlocked(note))
+        {
+            return RedirectToAction(nameof(Open), new { name });
+        }
+
+        return View("Unlock", new UnlockNoteViewModel { Name = note.Name });
+    }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Unlock(string name, UnlockNoteViewModel model)
@@ -210,10 +239,11 @@ public class NotesController(
 
         if (!string.IsNullOrEmpty(note.PasswordHash) && !IsNoteUnlocked(note) && !PasswordMatches(note, password))
         {
-            var lockedModel = await BuildEditorModelAsync(note.Name);
-            lockedModel.IsProtected = true;
-            lockedModel.ErrorMessage = "Enter the Nix password to restore a version.";
-            return View("Editor", lockedModel);
+            return View("Unlock", new UnlockNoteViewModel
+            {
+                Name = note.Name,
+                ErrorMessage = "Enter the Nix password to restore a version."
+            });
         }
 
         var version = await dbContext.NoteVersions
@@ -314,7 +344,8 @@ public class NotesController(
                 {
                     Name = noteTag.Note!.Name,
                     UpdatedAt = noteTag.Note.UpdatedAt,
-                    IsProtected = !string.IsNullOrEmpty(noteTag.Note.PasswordHash)
+                    IsProtected = !string.IsNullOrEmpty(noteTag.Note.PasswordHash),
+                    IsUnlocked = IsNoteUnlocked(noteTag.Note)
                 })
                 .OrderByDescending(note => note.UpdatedAt)
                 .ToList()

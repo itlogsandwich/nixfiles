@@ -22,7 +22,9 @@
         <div class="tag-results">
             @foreach (var nix in Model.Nixes)
             {
-                <a class="tag-result" asp-controller="Notes" asp-action="Open" asp-route-name="@nix.Name">
+                var actionName = nix.IsProtected && !nix.IsUnlocked ? "Unlock" : "Open";
+
+                <a class="tag-result" asp-controller="Notes" asp-action="@actionName" asp-route-name="@nix.Name">
                     <span>/@nix.Name</span>
                     <small>
                         @(nix.IsProtected ? "Protected" : "Public") · Updated @nix.UpdatedAt.ToLocalTime().ToString("g")

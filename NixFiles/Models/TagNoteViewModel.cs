@@ -7,4 +7,6 @@ public class TagNoteViewModel
     public DateTime UpdatedAt { get; set; }
 
     public bool IsProtected { get; set; }
+
+    public bool IsUnlocked { get; set; }
 }
