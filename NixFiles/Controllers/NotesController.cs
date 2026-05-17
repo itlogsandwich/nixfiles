@@ -1,10 +1,10 @@
 using System.Security.Claims;
-using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NixFiles.Data;
 using NixFiles.Models;
+using NixFiles.Services;
 
 namespace NixFiles.Controllers;
 
@@ -13,14 +13,6 @@ public class NotesController(
     IPasswordHasher<Note> passwordHasher,
     IWebHostEnvironment environment) : Controller
 {
-    private static readonly Regex NoteNamePattern = new(
-        "^[A-Za-z0-9-]{1,450}$",
-        RegexOptions.Compiled | RegexOptions.CultureInvariant);
-
-    private static readonly Regex TagSplitter = new(
-        "[,\\s]+",
-        RegexOptions.Compiled | RegexOptions.CultureInvariant);
-
     private static readonly HashSet<string> AllowedImageExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
         ".gif",
@@ -33,7 +25,7 @@ public class NotesController(
     [HttpGet]
     public async Task<IActionResult> Open(string name)
     {
-        if (!IsValidName(name))
+        if (!NoteInputRules.IsValidNoteName(name))
         {
             return NotFound();
         }
@@ -73,7 +65,7 @@ public class NotesController(
     [HttpGet]
     public async Task<IActionResult> Unlock(string name)
     {
-        if (!IsValidName(name))
+        if (!NoteInputRules.IsValidNoteName(name))
         {
             return NotFound();
         }
@@ -103,7 +95,7 @@ public class NotesController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Unlock(string name, UnlockNoteViewModel model)
     {
-        if (!IsValidName(name))
+        if (!NoteInputRules.IsValidNoteName(name))
         {
             return NotFound();
         }
@@ -152,7 +144,7 @@ public class NotesController(
     [Consumes("application/x-www-form-urlencoded", "multipart/form-data")]
     public async Task<IActionResult> Save(string name, NoteEditorViewModel model)
     {
-        if (!IsValidName(name))
+        if (!NoteInputRules.IsValidNoteName(name))
         {
             return NotFound();
         }
@@ -190,11 +182,16 @@ public class NotesController(
     [ValidateAntiForgeryToken]
     [Consumes("application/json")]
     [ActionName(nameof(Save))]
-    public async Task<IActionResult> SaveJson(string name, [FromBody] SaveNoteRequest model)
+    public async Task<IActionResult> SaveJson(string name, [FromBody] SaveNoteRequest? model)
     {
-        if (!IsValidName(name))
+        if (!NoteInputRules.IsValidNoteName(name))
         {
             return NotFound();
+        }
+
+        if (model is null)
+        {
+            return BadRequest(new { success = false, error = "Invalid save request." });
         }
 
         var result = await SaveNoteAsync(name, model.Content, model.Password, model.TagsText, model.ExpiresIn);
@@ -219,7 +216,7 @@ public class NotesController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Restore(string name, int versionId, string? password)
     {
-        if (!IsValidName(name))
+        if (!NoteInputRules.IsValidNoteName(name))
         {
             return NotFound();
         }
@@ -237,13 +234,18 @@ public class NotesController(
             return View("Expired", name);
         }
 
-        if (!string.IsNullOrEmpty(note.PasswordHash) && !IsNoteUnlocked(note) && !PasswordMatches(note, password))
+        if (!string.IsNullOrEmpty(note.PasswordHash) && !IsNoteUnlocked(note))
         {
-            return View("Unlock", new UnlockNoteViewModel
+            if (!PasswordMatches(note, password))
             {
-                Name = note.Name,
-                ErrorMessage = "Enter the Nix password to restore a version."
-            });
+                return View("Unlock", new UnlockNoteViewModel
+                {
+                    Name = note.Name,
+                    ErrorMessage = "Enter the Nix password to restore a version."
+                });
+            }
+
+            MarkNoteUnlocked(note);
         }
 
         var version = await dbContext.NoteVersions
@@ -272,9 +274,9 @@ public class NotesController(
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> UploadImage(string name, IFormFile image)
+    public async Task<IActionResult> UploadImage(string name, IFormFile? image)
     {
-        if (!IsValidName(name))
+        if (!NoteInputRules.IsValidNoteName(name))
         {
             return BadRequest(new { error = "Invalid Nix name." });
         }
@@ -285,7 +287,15 @@ public class NotesController(
             return StatusCode(StatusCodes.Status410Gone, new { error = "This Nix has expired." });
         }
 
-        if (image.Length == 0 || !image.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+        if (note is not null && !string.IsNullOrEmpty(note.PasswordHash) && !IsNoteUnlocked(note))
+        {
+            return Unauthorized(new { error = "Unlock this Nix before attaching images." });
+        }
+
+        if (image is null ||
+            image.Length == 0 ||
+            string.IsNullOrWhiteSpace(image.ContentType) ||
+            !image.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
         {
             return BadRequest(new { error = "Select an image file." });
         }
@@ -316,7 +326,7 @@ public class NotesController(
     [HttpGet]
     public async Task<IActionResult> Tagged(string tagName)
     {
-        var normalizedTag = NormalizeTag(tagName);
+        var normalizedTag = NoteInputRules.NormalizeTag(tagName);
         if (normalizedTag is null)
         {
             return NotFound();
@@ -522,7 +532,7 @@ public class NotesController(
 
     private async Task UpdateTagsAsync(string noteName, string? tagsText)
     {
-        var tags = ParseTags(tagsText);
+        var tags = NoteInputRules.ParseTags(tagsText);
 
         var existing = await dbContext.NoteTags
             .Where(noteTag => noteTag.NoteName == noteName)
@@ -584,41 +594,6 @@ public class NotesController(
     private static string GetUnlockSessionKey(string noteName)
     {
         return $"UnlockedNote:{noteName}";
-    }
-
-    private static IReadOnlyList<string> ParseTags(string? tagsText)
-    {
-        if (string.IsNullOrWhiteSpace(tagsText))
-        {
-            return [];
-        }
-
-        return TagSplitter.Split(tagsText)
-            .Select(NormalizeTag)
-            .Where(tag => tag is not null)
-            .Select(tag => tag!)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .Take(12)
-            .ToList();
-    }
-
-    private static string? NormalizeTag(string? tag)
-    {
-        if (string.IsNullOrWhiteSpace(tag))
-        {
-            return null;
-        }
-
-        var normalized = tag.Trim().TrimStart('#').ToLowerInvariant();
-        normalized = Regex.Replace(normalized, "[^a-z0-9-]", "-");
-        normalized = Regex.Replace(normalized, "-{2,}", "-").Trim('-');
-
-        return normalized is { Length: > 0 and <= 100 } ? normalized : null;
-    }
-
-    private static bool IsValidName(string? name)
-    {
-        return !string.IsNullOrWhiteSpace(name) && NoteNamePattern.IsMatch(name);
     }
 
     private enum SaveNoteStatus

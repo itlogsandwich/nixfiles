@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet *)",
+      "Bash(dir Migrations\\\\20260516001000*)",
+      "PowerShell(Get-Process *)",
+      "Bash(powershell *)",
+      "Bash(powershell.exe *)",
+      "Bash(sqlcmd *)",
+      "Bash(sqllocaldb info *)",
+      "Bash(cmd.exe *)",
+      "Bash(cmd /c tasklist)",
+      "Bash(ps -W)"
+    ]
+  }
+}

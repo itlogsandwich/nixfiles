@@ -7,6 +7,10 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/Dotnet.gitignore
 
+# Local IDE state
+.vs/
+*.csproj.user
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -47,6 +51,13 @@ CodeCoverage/
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
+*.log
+
+# Runtime/local scratch files
+cookies.txt
+response.html
+wwwroot/uploads/
+NixFiles/wwwroot/uploads/
 
 # NUnit
 *.VisualState.xml

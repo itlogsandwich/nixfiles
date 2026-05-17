@@ -161,6 +161,7 @@
     <script>
         const imageInput = document.getElementById("imageInput");
         const noteName = @Json.Serialize(Model.Name);
+        const isNewNote = @Json.Serialize(Model.IsNew);
         const contentInput = document.getElementById("Content");
         const noteForm = document.querySelector(".note-form");
         const tagsInput = document.getElementById("TagsText");
@@ -237,6 +238,12 @@
         function scheduleAutoSave(message) {
             clearTimeout(autoSaveTimeout);
             localStorage.setItem(draftKey, contentInput.value);
+
+            if (isNewNote) {
+                setSaveStatus("Draft saved locally");
+                return;
+            }
+
             setSaveStatus(message || "Typing...");
 
             autoSaveTimeout = setTimeout(function () {

@@ -31,8 +31,8 @@ Identity is additive, not required. A user can still open `/project-notes`, writ
 
 ## Tech Stack
 
-- ASP.NET Core MVC
-- Entity Framework Core
+- ASP.NET Core MVC on .NET 10
+- Entity Framework Core 10
 - Microsoft SQL Server / LocalDB
 - ASP.NET Identity
 - Razor views
@@ -42,7 +42,13 @@ Identity is additive, not required. A user can still open `/project-notes`, writ
 
 ## Run Locally
 
-From the project directory:
+Prerequisites:
+
+- .NET 10 SDK
+- SQL Server LocalDB or another SQL Server instance
+- `dotnet-ef` if you want to run migrations manually
+
+From the repository root:
 
 ```powershell
 cd NixFiles
@@ -58,6 +64,20 @@ Default development database:
 ```
 
 The app also applies migrations automatically in Development.
+
+Uploaded images are stored under `NixFiles/wwwroot/uploads` at runtime. That directory is ignored by git.
+
+## Project Structure
+
+| Path | Purpose |
+| --- | --- |
+| `NixFiles/Controllers` | MVC request handlers for notes, accounts, bookmarks, and home pages. |
+| `NixFiles/Data` | EF Core `AppDbContext` and model configuration. |
+| `NixFiles/Models` | Entity and view-model classes. |
+| `NixFiles/Services` | Shared input rules for note names and tags. |
+| `NixFiles/Views` | Razor pages for the editor, account forms, bookmarks, tags, and layout. |
+| `NixFiles/wwwroot` | Static CSS, JavaScript, vendored libraries, and runtime uploads. |
+| `NixFiles/Migrations` | EF Core schema migrations. |
 
 ## Main Routes
 
@@ -192,6 +212,8 @@ The editor listens for content changes, waits for two seconds of inactivity, the
 
 Manual Save still works through the same route and redirects back to the canonical `/{name}` URL after saving.
 
+For a brand-new Nix, drafts are kept in browser storage until the first manual Save. This preserves the user's chance to set the initial password, tags, and expiration before the note exists on the server. Once a note exists, server auto-save resumes.
+
 ### Expiring Notes
 
 Notes can be set to expire after one hour, one day, or seven days. Expired notes are deleted when accessed and display the expired page instead of the editor.
@@ -203,3 +225,19 @@ Bookmarks require login, but notes do not. A signed-in user can bookmark any exi
 ### Password Protection
 
 Note passwords are per-note, independent of Identity accounts. A protected note asks for the note password before opening the editor. After a successful unlock, that note stays unlocked for the current browser session, so manual save, auto-save, and restore actions do not ask for the password again until the session expires or a new browser session is used.
+
+Image uploads for protected notes also require that the note is unlocked in the current session.
+
+## Security and Operations
+
+- Note passwords are hashed with ASP.NET Core `PasswordHasher<Note>`.
+- Account passwords are handled by ASP.NET Identity.
+- CSRF validation is enabled on form, JSON save, restore, bookmark, logout, and image upload posts.
+- Note names are limited to letters, numbers, and dashes.
+- Tags are normalized to lowercase URL-safe labels.
+- Development auto-migration is convenient locally, but production deployments should run migrations as an explicit release step.
+- The editor depends on EasyMDE and DOMPurify from jsDelivr. For locked-down or offline deployments, vendor those assets into `wwwroot/lib`.
+
+## Repository Hygiene
+
+The `.gitignore` excludes build outputs, Visual Studio local state, logs, scratch response/cookie captures, and runtime uploads. If those files were already tracked before the ignore rules existed, remove them from git with a normal repository cleanup commit instead of editing application code around them.

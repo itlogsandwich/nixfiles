@@ -12,8 +12,8 @@ using NixFiles.Data;
 namespace NixFiles.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260517114047_AddIdentityAndBookmarks")]
-    partial class AddIdentityAndBookmarks
+    [Migration("20260517223331_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

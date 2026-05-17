@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NixFiles.Data;
 using NixFiles.Models;
+using NixFiles.Services;
 
 namespace NixFiles.Controllers;
 
@@ -43,6 +44,11 @@ public class BookmarksController(AppDbContext dbContext) : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Toggle(string noteName, string? returnUrl = null)
     {
+        if (!NoteInputRules.IsValidNoteName(noteName))
+        {
+            return NotFound();
+        }
+
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId is null)
         {
