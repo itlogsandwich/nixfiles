@@ -203,11 +203,3 @@ Bookmarks require login, but notes do not. A signed-in user can bookmark any exi
 ### Password Protection
 
 Note passwords are per-note, independent of Identity accounts. A protected note asks for the note password before opening the editor. After a successful unlock, that note stays unlocked for the current browser session, so manual save, auto-save, and restore actions do not ask for the password again until the session expires or a new browser session is used.
-
-## Design Defense
-
-NixFiles preserves anonymity while offering optional persistence for users who want convenience. Authentication does not change the access model; it only allows a user to keep a personal list of bookmarked notes.
-
-One-line defense:
-
-> NixFiles is anonymous by default, but remembers things only if you ask it to.
