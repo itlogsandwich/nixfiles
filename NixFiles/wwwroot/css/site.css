@@ -390,6 +390,24 @@ main {
   background: var(--nix-surface);
 }
 
+.editor-frame > textarea {
+  display: block;
+  width: 100%;
+  min-height: 520px;
+  padding: 12px 14px;
+  border: 0;
+  outline: 0;
+  resize: vertical;
+  background: var(--nix-surface);
+  color: var(--nix-text);
+  caret-color: var(--nix-primary);
+  font-family: var(--nix-font-label);
+}
+
+.editor-frame > textarea::placeholder {
+  color: var(--nix-muted);
+}
+
 .editor-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 280px;
@@ -785,6 +803,10 @@ main {
   }
 
   .EasyMDEContainer .CodeMirror {
+    min-height: min(62vh, 430px);
+  }
+
+  .editor-frame > textarea {
     min-height: min(62vh, 430px);
   }
 
