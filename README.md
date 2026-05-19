@@ -6,6 +6,8 @@ NixFiles is an ASP.NET Core MVC note system built around zero-friction access:
 
 Users can create and open notes without signing in. Accounts are optional and only add convenience features such as bookmarks.
 
+<img width="1861" height="925" alt="image" src="https://github.com/user-attachments/assets/d9cadff8-2264-4cfb-9c37-fab54c5bcddb" />
+
 ## Features
 
 - Anonymous notes by URL-friendly name
