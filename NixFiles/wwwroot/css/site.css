@@ -397,11 +397,30 @@ main {
   align-items: start;
 }
 
-.EasyMDEContainer .CodeMirror,
-.EasyMDEContainer .editor-toolbar {
+:root .EasyMDEContainer .CodeMirror,
+:root .EasyMDEContainer .CodeMirror.CodeMirror-sided,
+:root .EasyMDEContainer .CodeMirror.CodeMirror-fullscreen,
+:root .EasyMDEContainer .editor-toolbar,
+:root .EasyMDEContainer .editor-toolbar.fullscreen {
   border-color: var(--nix-border);
+  background: var(--nix-surface) !important;
+  color: var(--nix-text);
+}
+
+:root .EasyMDEContainer .CodeMirror-scroll,
+:root .EasyMDEContainer .CodeMirror-sizer,
+:root .EasyMDEContainer .CodeMirror-lines {
   background: var(--nix-surface);
   color: var(--nix-text);
+}
+
+:root .EasyMDEContainer .CodeMirror-gutters {
+  border-color: var(--nix-border);
+  background: var(--nix-surface-strong);
+}
+
+:root .EasyMDEContainer .CodeMirror-linenumber {
+  color: var(--nix-muted);
 }
 
 .EasyMDEContainer .editor-toolbar button,
@@ -430,16 +449,51 @@ main {
   overflow-x: hidden !important;
 }
 
-.EasyMDEContainer .CodeMirror pre.CodeMirror-line,
-.EasyMDEContainer .CodeMirror pre.CodeMirror-line-like {
+:root .EasyMDEContainer .CodeMirror pre.CodeMirror-line,
+:root .EasyMDEContainer .CodeMirror pre.CodeMirror-line-like {
   white-space: pre-wrap;
   word-break: break-word;
-}
-
-.editor-preview,
-.editor-preview-side {
   background: var(--nix-surface);
   color: var(--nix-text);
+}
+
+:root .editor-preview,
+:root .editor-preview-side {
+  background: var(--nix-surface);
+  color: var(--nix-text);
+}
+
+:root .editor-preview-side {
+  border-color: var(--nix-border);
+}
+
+:root .editor-preview a,
+:root .editor-preview-side a {
+  color: var(--nix-link);
+}
+
+:root .editor-preview blockquote,
+:root .editor-preview-side blockquote,
+:root .editor-preview table,
+:root .editor-preview-side table,
+:root .editor-preview th,
+:root .editor-preview-side th,
+:root .editor-preview td,
+:root .editor-preview-side td {
+  border-color: var(--nix-border);
+}
+
+:root .editor-preview code,
+:root .editor-preview-side code,
+:root .editor-preview pre,
+:root .editor-preview-side pre {
+  background: var(--nix-surface-strong);
+  color: var(--nix-text);
+}
+
+:root .editor-preview hr,
+:root .editor-preview-side hr {
+  border-color: var(--nix-border);
 }
 
 .save-bar {
