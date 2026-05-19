@@ -224,7 +224,7 @@ Bookmarks require login, but notes do not. A signed-in user can bookmark any exi
 
 ### Password Protection
 
-Note passwords are per-note, independent of Identity accounts. A protected note asks for the note password before opening the editor. After a successful unlock, that note stays unlocked for the current browser session, so manual save, auto-save, and restore actions do not ask for the password again until the session expires or a new browser session is used.
+Note passwords are per-note, independent of Identity accounts. A protected note asks for the note password before opening the editor. After a successful unlock, that note stays unlocked only while the user remains on that Nix, so manual save, auto-save, and restore actions do not ask for the password again until the user leaves the Nix or logs out.
 
 Image uploads for protected notes also require that the note is unlocked in the current session.
 

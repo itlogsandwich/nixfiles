@@ -10,7 +10,8 @@
       "Bash(sqllocaldb info *)",
       "Bash(cmd.exe *)",
       "Bash(cmd /c tasklist)",
-      "Bash(ps -W)"
+      "Bash(ps -W)",
+      "PowerShell(Stop-Process *)"
     ]
   }
 }

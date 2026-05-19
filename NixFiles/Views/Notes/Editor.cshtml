@@ -23,7 +23,9 @@
                     <button class="btn btn-outline-secondary" type="submit">@(Model.IsBookmarked ? "Bookmarked" : "Bookmark")</button>
                 </form>
             }
-            <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">New path</a>
+            <form asp-controller="Notes" asp-action="Leave" asp-route-name="@Model.Name" method="post">
+                <button class="btn btn-outline-secondary" type="submit">Leave Nix</button>
+            </form>
         </div>
     </div>
 

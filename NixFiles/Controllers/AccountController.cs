@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NixFiles.Models;
+using NixFiles.Services;
 
 namespace NixFiles.Controllers;
 
@@ -94,6 +95,7 @@ public class AccountController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
+        NoteUnlockSession.ForgetAll(HttpContext.Session);
         await signInManager.SignOutAsync();
         return RedirectToAction("Index", "Home");
     }

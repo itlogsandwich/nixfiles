@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using NixFiles.Data;
 using NixFiles.Models;
+using NixFiles.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,6 +69,15 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseSession();
+app.Use(async (context, next) =>
+{
+    if (ShouldForgetUnlockedNotes(context.Request, context.Session))
+    {
+        NoteUnlockSession.ForgetAll(context.Session);
+    }
+
+    await next();
+});
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -103,6 +114,11 @@ app.MapControllerRoute(
     defaults: new { controller = "Notes", action = "UploadImage" });
 
 app.MapControllerRoute(
+    name: "note-leave",
+    pattern: "{name:regex(^[A-Za-z0-9-]+$)}/leave",
+    defaults: new { controller = "Notes", action = "Leave" });
+
+app.MapControllerRoute(
     name: "note-restore",
     pattern: "{name:regex(^[A-Za-z0-9-]+$)}/restore/{versionId:int}",
     defaults: new { controller = "Notes", action = "Restore" });
@@ -124,3 +140,39 @@ app.MapControllerRoute(
 
 
 app.Run();
+
+static bool ShouldForgetUnlockedNotes(HttpRequest request, ISession session)
+{
+    var activeNoteName = NoteUnlockSession.GetActiveNoteName(session);
+    if (string.IsNullOrEmpty(activeNoteName) || !AcceptsHtml(request) || IsBookmarkToggle(request))
+    {
+        return false;
+    }
+
+    var firstSegment = GetFirstPathSegment(request.Path);
+    return !string.Equals(firstSegment, activeNoteName, StringComparison.Ordinal);
+}
+
+static bool AcceptsHtml(HttpRequest request)
+{
+    return request.Headers.Accept.Any(value =>
+        value?.Contains("text/html", StringComparison.OrdinalIgnoreCase) == true);
+}
+
+static bool IsBookmarkToggle(HttpRequest request)
+{
+    return HttpMethods.IsPost(request.Method) &&
+        request.Path.StartsWithSegments("/bookmarks", StringComparison.OrdinalIgnoreCase);
+}
+
+static string GetFirstPathSegment(PathString path)
+{
+    var value = path.Value?.Trim('/');
+    if (string.IsNullOrEmpty(value))
+    {
+        return string.Empty;
+    }
+
+    var slashIndex = value.IndexOf('/');
+    return slashIndex >= 0 ? value[..slashIndex] : value;
+}

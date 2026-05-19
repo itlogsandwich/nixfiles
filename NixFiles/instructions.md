@@ -10,7 +10,7 @@ Implemented features:
 
 - URL-addressable notes at `/{name}`
 - Optional per-note passwords
-- Browser-session unlock state for protected notes
+- Active-Nix unlock state for protected notes
 - Markdown editing with EasyMDE and sanitized preview through DOMPurify
 - Manual save and server auto-save for existing notes
 - Local-only drafts before first manual save
@@ -26,7 +26,7 @@ Implemented features:
 - `Program.cs` wires MVC, sessions, EF Core, Identity, and the custom routes.
 - `AppDbContext` owns entity configuration and Identity tables.
 - `NoteInputRules` is the shared source of truth for note-name validation and tag normalization.
-- Protected note checks should use the existing session helpers in `NotesController`.
+- Protected note checks should use `NoteUnlockSession` so unlock state is cleared when the user leaves the active Nix or logs out.
 - Runtime uploads belong under `wwwroot/uploads`; do not commit them.
 
 ## Frontend Notes

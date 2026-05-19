@@ -1,10 +1,10 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NixFiles.Data;
 using NixFiles.Models;
 using NixFiles.Services;
+using System.Security.Claims;
 
 namespace NixFiles.Controllers;
 
@@ -51,6 +51,11 @@ public class NotesController(
         if (!string.IsNullOrEmpty(note.PasswordHash) && !IsNoteUnlocked(note))
         {
             return View("Unlock", new UnlockNoteViewModel { Name = name });
+        }
+
+        if (!string.IsNullOrEmpty(note.PasswordHash))
+        {
+            MarkNoteUnlocked(note);
         }
 
         await LogAccessAsync(note.Name);
@@ -130,7 +135,7 @@ public class NotesController(
 
         MarkNoteUnlocked(note);
 
-        TempData["StatusMessage"] = "Unlocked for this browser session.";
+        TempData["StatusMessage"] = "Unlocked until you leave this Nix.";
         return RedirectToAction(nameof(Open), new { name = note.Name });
     }
 
@@ -205,6 +210,19 @@ public class NotesController(
             SaveNoteStatus.Expired => StatusCode(StatusCodes.Status410Gone, new { success = false, error = "This Nix has expired." }),
             _ => BadRequest(new { success = false, error = "The Nix could not be saved." })
         };
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Leave(string name)
+    {
+        if (!NoteInputRules.IsValidNoteName(name))
+        {
+            return NotFound();
+        }
+
+        NoteUnlockSession.Forget(HttpContext.Session, name);
+        return RedirectToAction("Index", "Home");
     }
 
     [HttpPost]
@@ -573,21 +591,12 @@ public class NotesController(
 
     private bool IsNoteUnlocked(Note note)
     {
-        return string.IsNullOrEmpty(note.PasswordHash) ||
-            HttpContext.Session.GetString(GetUnlockSessionKey(note.Name)) == note.PasswordHash;
+        return NoteUnlockSession.IsUnlocked(HttpContext.Session, note);
     }
 
     private void MarkNoteUnlocked(Note note)
     {
-        if (!string.IsNullOrEmpty(note.PasswordHash))
-        {
-            HttpContext.Session.SetString(GetUnlockSessionKey(note.Name), note.PasswordHash);
-        }
-    }
-
-    private static string GetUnlockSessionKey(string noteName)
-    {
-        return $"UnlockedNote:{noteName}";
+        NoteUnlockSession.MarkUnlocked(HttpContext.Session, note);
     }
 
     private enum SaveNoteStatus
